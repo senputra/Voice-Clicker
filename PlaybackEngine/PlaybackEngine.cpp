@@ -1,9 +1,6 @@
-#include "Buffer.h"
+// PlaybackEngine.cpp : Defines the exported functions for the DLL application.
+//
 #include "PlaybackEngine.h"
-#include "RtAudio.h"
-
-#include <iostream>
-#include <map>
 
 int udp(void *outputBuffer, void * /*inputBuffer*/, unsigned int nBufferFrames,
 	double /*streamTime*/, RtAudioStreamStatus status, void *userData) {
@@ -33,7 +30,7 @@ void PlaybackEngine::setupPlaybackStream() {
 
 	RtAudio::StreamParameters oParams;
 	oParams.deviceId = dac.getDefaultOutputDevice();
-	oParams.nChannels = 1;
+	oParams.nChannels = 2;
 	oParams.firstChannel = 0;
 
 	dac.showWarnings(true);
@@ -59,8 +56,8 @@ int PlaybackEngine::getDataFromUDP(void *outputBuffer, unsigned int nBufferFrame
 
 	//memcpy(reinterpret_cast<short*>(outputBuffer), buffer_->getlistenerPointer(), nBufferFrames);
 
-	postProcessing(reinterpret_cast<short*>(outputBuffer), buffer_->getlistenerPointer(),nBufferFrames);
-	
+	postProcessing(reinterpret_cast<short*>(outputBuffer), buffer_->getlistenerPointer(), nBufferFrames);
+
 
 	//std::cout << "shitasdas " << std::endl;
 	return 0;
@@ -72,20 +69,25 @@ int PlaybackEngine::getDataFromUDP(void *outputBuffer, unsigned int nBufferFrame
 void PlaybackEngine::postProcessing(short * outputBuffer, short* udpBuffer, unsigned int nBufferFrames) {
 	/*memcpy(reinterpret_cast<short*>(outputBuffer), udpBuffer, nBufferFrames);
 	std::cout << alpha << std::endl;*/
-	for (int i = 0; i < nBufferFrames; i++) {
-		outputBufferPreviousI = (int)(outputBufferPreviousI + (alpha*(udpBuffer[i] - outputBufferPreviousI)));
-		temp = outputBufferPreviousI * 8;
+	for (int i = 0; i < nBufferFrames * 2; i += 2) {
+		outputBufferPreviousI = (int)(outputBufferPreviousI + (alpha*(udpBuffer[i / 2] - outputBufferPreviousI)));
+		temp = outputBufferPreviousI;
+		//temp = udpBuffer[i/2];
 		if (temp > SHRT_MAX) {
 			outputBuffer[i] = SHRT_MAX;
+			outputBuffer[i + 1] = SHRT_MAX;
 		}
 		else if (temp < SHRT_MIN) {
 			outputBuffer[i] = SHRT_MIN;
+			outputBuffer[i + 1] = SHRT_MIN;
 		}
 		else {
 			outputBuffer[i] = temp;
+			outputBuffer[i + 1] = temp;
 		}
 	}
-	temp = outputBuffer[nBufferFrames - 1];
+	//temp = outputBuffer[nBufferFrames - 1];
+	//memcpy(outputBuffer, udpBuffer, nBufferFrames*2);
 }
 
 PlaybackEngine::PlaybackEngine(Buffer *buffer)
@@ -94,3 +96,6 @@ PlaybackEngine::PlaybackEngine(Buffer *buffer)
 
 	setupPlaybackStream();
 }
+
+
+

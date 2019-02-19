@@ -1,11 +1,11 @@
 // Voice Clicker.cpp : This file contains the 'main' function. Program execution begins and ends there.
 //
 
+#include "Buffer.h"
 #include "StreamServer.h"
 #include "InputEngineServer.h"
 #include "InputEngine.h"
 #include "PlaybackEngine.h"
-#include "Buffer.h"
 #include <iostream>
 #include <thread>
 

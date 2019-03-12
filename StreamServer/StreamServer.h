@@ -24,6 +24,8 @@ public:
 	StreamServer(boost::asio::io_context& io_context, Buffer* buffer, int port);
 	~StreamServer();
 
+	int getLocalPort();
+
 private:
 	void start_receive();
 
@@ -37,6 +39,7 @@ private:
 	udp::socket socket_;
 	udp::endpoint remote_endpoint_;
 	Buffer *buffer_;
+
 };
 
 #endif

@@ -25,7 +25,6 @@ void PlaybackEngine::setupPlaybackStream() {
 
 	// Set our stream parameters for output only.
 	unsigned int bufferFrames = 192;
-	//unsigned int bufferFrames = 768;
 	unsigned int sampleRate = 48000;
 
 	RtAudio::StreamParameters oParams;
@@ -39,7 +38,7 @@ void PlaybackEngine::setupPlaybackStream() {
 		dac.openStream(&oParams, NULL, RTAUDIO_SINT16, sampleRate, &bufferFrames, &udp, this, NULL, &errorCallback);
 		dac.startStream();
 		if (dac.isStreamOpen()) {
-			std::cout << "Stream is open" << std::endl;
+			printf("Stream is open. bufferFrames :: %d. Sample Rate :: %d", bufferFrames, sampleRate);
 		}
 	}
 	catch (RtAudioError& e) {

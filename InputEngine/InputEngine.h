@@ -30,6 +30,19 @@ private:
 	static const uint8_t KEYBOARD_ACTION_EMOJI = 11;
 	static const uint8_t KEYBOARD_ACTION_OTHERS = 12;
 
+	int16_t lastXCoor = -1;
+	int16_t lastYCoor = -1;
+	int16_t newXCoor = -1;
+	int16_t newYCoor = -1;
+
+	int16_t lastXAverage = -1;
+	int16_t lastYAverage = -1;
+	int16_t newXAverage= -1;
+	int16_t newYAverage= -1;
+
+	static const int16_t SENSITIVITY = 2;
+
+
 public:
 	InputEngine();
 
@@ -38,7 +51,7 @@ public:
 	//The input must be Windows Scancodes
 	void static PressKeyOthers(uint8_t ca, bool bExtended);
 
-	void static MouseMovements(uint8_t dwFlags, uint16_t dx, uint16_t dy, uint8_t mouseData);
+	void static MouseMovements(DWORD dwFlags, int16_t dx, int16_t dy, int16_t mouseData);
 
 	uint8_t* getCommandBuffer();
 

@@ -26,3 +26,7 @@ void InputEngineServer::handle_receive(const boost::system::error_code& error,
 		start_receive();
 	}
 }
+
+int InputEngineServer::getLocalPort() {
+	return socket_.local_endpoint().port();
+}

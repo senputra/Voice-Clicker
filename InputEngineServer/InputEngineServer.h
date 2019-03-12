@@ -22,6 +22,7 @@ class INPUTENGINESERVER_API InputEngineServer
 {
 public:
 	InputEngineServer(boost::asio::io_context& io_context, InputEngine* ieEngine, int port);
+	int getLocalPort();
 
 private:
 	void start_receive();

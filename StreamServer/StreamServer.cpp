@@ -4,7 +4,7 @@
 #include"StreamServer.h"
 
 
-StreamServer::StreamServer(boost::asio::io_context& io_context, Buffer* buffer, int port)
+StreamServer::StreamServer(boost::asio::io_context& io_context, Buffer* buffer, int port) 
 	: socket_(io_context, udp::endpoint(udp::v4(), port)) {
 
 	buffer_ = buffer;
@@ -13,6 +13,11 @@ StreamServer::StreamServer(boost::asio::io_context& io_context, Buffer* buffer, 
 
 StreamServer::~StreamServer()
 {
+}
+
+int StreamServer::getLocalPort()
+{
+	return socket_.local_endpoint().port();
 }
 
 void StreamServer::start_receive()
@@ -30,6 +35,9 @@ void StreamServer::handle_receive(const boost::system::error_code& error,
 	if (!error)
 	{
 		start_receive();
+	}
+	else {
+		printf("%s",error.value());
 	}
 }
 

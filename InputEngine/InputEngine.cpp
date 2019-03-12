@@ -2,6 +2,7 @@
 //
 
 #include "InputEngine.h"
+#include <thread>
 
 InputEngine::InputEngine()
 {
@@ -50,14 +51,17 @@ void InputEngine::PressKeyOthers(uint8_t ca, bool bExtended)
 	SendInput(1, &ip, sizeof(INPUT));
 }
 
-void InputEngine::MouseMovements(uint8_t dwFlags, uint16_t dx, uint16_t dy, uint8_t mouseData) {
+void InputEngine::MouseMovements(DWORD dwFlags, int16_t dx, int16_t dy, int16_t mouseData) {
 
 	//Structuring for the mouse event
 	INPUT ip;
 	//Set up the INPUT structure
 	ip.type = INPUT_MOUSE;
-	ip.mi.dx = dx;
-	ip.mi.dy = dy;
+	ip.mi.dx = (dx == 1) ? dx : dx / SENSITIVITY;
+	ip.mi.dy = (dy == 1) ? dy : dy / SENSITIVITY;
+	ip.mi.dwExtraInfo = 0;
+	ip.mi.mouseData = mouseData;
+	ip.mi.time = 0;
 	/**
 	* If dwFlags contains MOUSEEVENTF_WHEEL, then mouseData specifies the amount of wheel movement.
 	* A positive value indicates that the wheel was rotated forward, away from the user;
@@ -68,8 +72,9 @@ void InputEngine::MouseMovements(uint8_t dwFlags, uint16_t dx, uint16_t dy, uint
 	*
 	* If dwFlags contains MOUSEEVENTF_XDOWN or MOUSEEVENTF_XUP, then mouseData specifies which X buttons were pressed or released.
 	* This value may be any combination of the following flags
+	* 
+	* Use MOUSEEVENTF_MOVE to move the cursor.
 	**/
-	ip.mi.mouseData = mouseData;
 	ip.mi.dwFlags = dwFlags;
 
 	SendInput(1, &ip, sizeof(INPUT));
@@ -91,30 +96,75 @@ void InputEngine::execute() {
 		switch (actionType) {
 		case MOUSE_ACTION_LEFT_CLICK:
 			std::cout << "CLICKLCICKCLICK left click" << std::endl;
+			MouseMovements(MOUSEEVENTF_LEFTDOWN, 0, 0, 0);
+			MouseMovements(MOUSEEVENTF_LEFTUP, 0, 0, 0);
 			break;
 		case MOUSE_ACTION_RIGHT_CLICK:
 			std::cout << "CLICKLCICKCLICK right click" << std::endl;
+			MouseMovements(MOUSEEVENTF_RIGHTDOWN, 0, 0, 0);
+			MouseMovements(MOUSEEVENTF_RIGHTUP, 0, 0, 0);
 			break;
 		case MOUSE_ACTION_LEFT_DOWN:
 			std::cout << "CLICKLCICKCLICK left down" << std::endl;
+			MouseMovements(MOUSEEVENTF_LEFTDOWN, 0, 0, 0);
 			break;
 		case MOUSE_ACTION_LEFT_UP:
 			std::cout << "CLICKLCICKCLICK left up" << std::endl;
+			MouseMovements(MOUSEEVENTF_LEFTUP, 0, 0, 0);
 			break;
 		case MOUSE_ACTION_MIDDLE_CLICK:
 			std::cout << "CLICKLCICKCLICK middle click" << std::endl;
+			MouseMovements(MOUSEEVENTF_MIDDLEDOWN, 0, 0, 0);
+			MouseMovements(MOUSEEVENTF_MIDDLEUP, 0, 0, 0);
 			break;
 		case MOUSE_ACTION_MOVE:
 			if (dataLength == 4) {
-				//MouseMovements(0, (command[3] << 8) + command[4], (command[5] << 8) + command[6], 0);
-				//printf("Received coordinate %d,%d \n", (command[3] << 8) + command[4], (command[5] << 8) + command[6]);
-				printf("Received coordinate\n");
+				if (lastXCoor == -1 && lastYCoor == -1) { //first time finger down
+					lastXCoor = (command[3] << 8) + command[4];
+					lastYCoor = (command[5] << 8) + command[6];
+				}
+				else { //finger moves
+					newXCoor = (command[3] << 8) + command[4];
+					newYCoor = (command[5] << 8) + command[6];
+					if (newXCoor == -1 & newYCoor == -1) {
+						lastXCoor = -1;
+						lastYCoor = -1;
+					}
+					else { //finger lifts, resetting all the condition
+						printf("Received coordinate %d,%d \n", newXCoor - lastXCoor, newYCoor - lastYCoor, 0);
+						MouseMovements(MOUSEEVENTF_MOVE, newXCoor - lastXCoor, newYCoor - lastYCoor, 0);
+						lastXCoor = newXCoor;
+						lastYCoor = newYCoor;
+					}
+				}
+				//printf("Received coordinate\n");
 				//std::cout << "move" << command[3] << " " << command[4];
 				break;
 			}
 
 		case MOUSE_ACTION_SCROLL:
-			if (dataLength == 2) {
+			if (dataLength == 4) {
+				if (lastXAverage == -1 && lastYAverage == -1) { //first time finger down
+					lastXAverage = (command[3] << 8) + command[4];
+					lastYAverage = (command[5] << 8) + command[6];
+				}
+				else { //finger moves
+					newXAverage = (command[3] << 8) + command[4];
+					newYAverage = (command[5] << 8) + command[6];
+					if (newXAverage == -1 & newYAverage == -1) {
+						lastXAverage = -1;
+						lastYAverage = -1;
+					}
+					else { //finger lifts, resetting all the condition
+						printf("Received Scroll %d,%d \n", newXAverage - lastXAverage, newYAverage - lastYAverage, 0);
+						MouseMovements(MOUSEEVENTF_WHEEL, 0, 0, newYAverage - lastYAverage);
+						MouseMovements(MOUSEEVENTF_HWHEEL, 0, 0, lastXAverage - newXAverage);
+						lastXAverage = newXAverage;
+						lastYAverage = newYAverage;
+					}
+				}
+				//printf("Received coordinate\n");
+				//std::cout << "move" << command[3] << " " << command[4];
 				break;
 			}
 		}

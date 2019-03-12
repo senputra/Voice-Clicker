@@ -30,14 +30,13 @@ private:
 
 	Buffer *buffer_ = nullptr;
 
-	void postProcessing(short * outputBuffer, short* udpBuffer, unsigned int nBufferFrames);
+	void postProcessing(short * outputBuffer, short* udpBuffer, unsigned int nBufferFrames); // Convert the mono channel to stereo
 
 	double RC = 1.0 / (22000 * 2 * 3.14);
 	double dt = 1.0 / 48000;
 	double alpha = dt / (RC + dt);
 
 	double outputBufferPreviousI = 0;
-	double temp = 0;
 };
 #endif // !PLAYBACKENGINE_H
 

@@ -70,7 +70,7 @@ void PlaybackEngine::postProcessing(short * outputBuffer, short* udpBuffer, unsi
 	std::cout << alpha << std::endl;*/
 	for (int i = 0; i < nBufferFrames * 2; i += 2) {
 		outputBufferPreviousI = (int)(outputBufferPreviousI + (alpha*(udpBuffer[i / 2] - outputBufferPreviousI)));
-		temp = outputBufferPreviousI;
+		short temp = outputBufferPreviousI;
 		//temp = udpBuffer[i/2];
 		if (temp > SHRT_MAX) {
 			outputBuffer[i] = SHRT_MAX;

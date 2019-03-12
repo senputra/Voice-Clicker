@@ -33,13 +33,10 @@ private:
 	short **buffer_;
 	short* writerPointer = nullptr;
 	short* listenerPointer = nullptr;
-	short* nullBuffer_;
 
 	int writerCounter = 0;
 	int listenerCounter = 0;
 
-	int* tempW = nullptr;
-	int* tempL = nullptr;
 
 
 

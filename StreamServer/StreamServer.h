@@ -39,6 +39,8 @@ private:
 	udp::socket socket_;
 	udp::endpoint remote_endpoint_;
 	Buffer *buffer_;
+	int bufferSize = 0;
+	size_t bufferSizeInBytes = 0;
 
 };
 

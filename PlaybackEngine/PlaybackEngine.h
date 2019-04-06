@@ -1,4 +1,4 @@
-#pragma once
+	#pragma once
 #ifndef PLAYBACKENGINE_H
 #define PLAYBACKENGINE_H
 
@@ -36,7 +36,7 @@ private:
 	double dt = 1.0 / 48000;
 	double alpha = dt / (RC + dt);
 
-	double outputBufferPreviousI = 0;
+	int outputBufferPreviousI = 0;
 };
 #endif // !PLAYBACKENGINE_H
 

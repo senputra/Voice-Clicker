@@ -27,10 +27,12 @@ so on and so off.
 
 class BUFFER_API Buffer {
 private:
-	int bufferSize = 192; // one frame takes 2 Byte [int16]
-	int nBuffers = 8;
+	int bufferSize = 256; // one frame takes 2 Byte [int16]
+	int nBuffers = 4;
 
 	short **buffer_;
+	short * nullBuffer;
+
 	short* writerPointer = nullptr;
 	short* listenerPointer = nullptr;
 
@@ -48,6 +50,7 @@ public:
 	short* getlistenerPointer();
 
 	size_t getMaxSizeInBytes();
+	size_t getBufferSize();
 };
 
 #endif // !BUFFER_H

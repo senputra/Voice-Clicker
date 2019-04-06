@@ -12,7 +12,6 @@
 #include <string>
 
 Poco::DNSSD::ServiceHandle inputServerHandle;
-Poco::DNSSD::ServiceHandle audioServerHandle;
 mDNS * mmDNS;
 
 int AUDIO_PORT = 0;
@@ -40,12 +39,6 @@ void startNetwork(Buffer *buffer_, int port) {
 		StreamServer server(io_context, buffer_, port);
 		AUDIO_PORT = server.getLocalPort();
 		advertise();
-		//int audioServerPort = server.getLocalPort();
-
-		/*if (mmDNS != nullptr) {
-			audioServerHandle = mmDNS->advertise("_VCAudio._udp", audioServerPort);
-		}*/
-
 
 		printf("\nAudio Stream server is up at port: %d\n", AUDIO_PORT);
 		io_context.run();
@@ -96,7 +89,6 @@ int main()
 	std::cin.get(); 
 	
 	mmDNS->discardAdvertise(inputServerHandle);
-	mmDNS->discardAdvertise(audioServerHandle);
 
 	delete(mmDNS);
 }

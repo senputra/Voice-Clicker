@@ -24,8 +24,11 @@ void PlaybackEngine::setupPlaybackStream() {
 	RtAudio dac;
 
 	// Set our stream parameters for output only.
-	unsigned int bufferFrames = 192;
+	unsigned int bufferFrames = 256;
 	unsigned int sampleRate = 48000;
+
+	RtAudio::StreamOptions sOptions;
+	sOptions.flags = RTAUDIO_MINIMIZE_LATENCY;
 
 	RtAudio::StreamParameters oParams;
 	oParams.deviceId = dac.getDefaultOutputDevice();
@@ -35,15 +38,16 @@ void PlaybackEngine::setupPlaybackStream() {
 	dac.showWarnings(true);
 
 	try {
-		dac.openStream(&oParams, NULL, RTAUDIO_SINT16, sampleRate, &bufferFrames, &udp, this, NULL, &errorCallback);
+		dac.openStream(&oParams, NULL, RTAUDIO_SINT16, sampleRate, &bufferFrames, &udp, this, &sOptions, &errorCallback);
 		dac.startStream();
 		if (dac.isStreamOpen()) {
 			printf("Stream is open. bufferFrames :: %d. Sample Rate :: %d", bufferFrames, sampleRate);
 		}
+	
 	}
 	catch (RtAudioError& e) {
 		e.printMessage();
-		std::cout << "Stream is wrong" << std::endl;
+		std::cout << "Stream is wrong" << std::endl;	
 	}
 
 	char input;
@@ -69,8 +73,8 @@ void PlaybackEngine::postProcessing(short * outputBuffer, short* udpBuffer, unsi
 	/*memcpy(reinterpret_cast<short*>(outputBuffer), udpBuffer, nBufferFrames);
 	std::cout << alpha << std::endl;*/
 	for (int i = 0; i < nBufferFrames * 2; i += 2) {
-		outputBufferPreviousI = (int)(outputBufferPreviousI + (alpha*(udpBuffer[i / 2] - outputBufferPreviousI)));
-		short temp = outputBufferPreviousI;
+		//outputBufferPreviousI = (int)(outputBufferPreviousI + (alpha*(udpBuffer[i / 2] - outputBufferPreviousI)));
+		int temp = udpBuffer[i / 2] << 1;
 		//temp = udpBuffer[i/2];
 		if (temp > SHRT_MAX) {
 			outputBuffer[i] = SHRT_MAX;

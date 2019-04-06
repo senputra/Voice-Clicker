@@ -8,6 +8,9 @@ StreamServer::StreamServer(boost::asio::io_context& io_context, Buffer* buffer, 
 	: socket_(io_context, udp::endpoint(udp::v4(), port)) {
 
 	buffer_ = buffer;
+	bufferSize = buffer_->getBufferSize();
+	bufferSizeInBytes = buffer_->getMaxSizeInBytes();
+	assert(bufferSize && bufferSizeInBytes);
 	start_receive();
 }
 
@@ -23,7 +26,7 @@ int StreamServer::getLocalPort()
 void StreamServer::start_receive()
 {
 	socket_.async_receive_from(
-		boost::asio::buffer(reinterpret_cast<char*>(buffer_->getWriterPointer()), 384), remote_endpoint_,
+		boost::asio::buffer(reinterpret_cast<char*>(buffer_->getWriterPointer()), bufferSizeInBytes), remote_endpoint_,
 		boost::bind(&StreamServer::handle_receive, this,
 			boost::asio::placeholders::error,
 			boost::asio::placeholders::bytes_transferred));

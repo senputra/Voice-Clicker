@@ -9,30 +9,17 @@ Buffer::Buffer() {
 		buffer_[i] = new int16_t[bufferSize];
 		memset(buffer_[i], 0, bufferSize * 2);
 	}
-	/*printf("buffer \n");
-	for (int i = 0; i < nBuffers; i++) {
-		for (int j = 0; j < bufferSize; j++) {
-			printf("%d",buffer_[i][j]);
-		}
-	}
-	printf("nullptr \n");*/
-	nullBuffer_ = new int16_t[bufferSize];
-	memset(nullBuffer_, 0, bufferSize * 2);
 
-	/*for (int j = 0; j < bufferSize * listenerBufferSize; j++) {
-		printf("%d", nullBuffer_[j]);
-	}*/
-	/*
-	std::cout << "new Buffer" << bufferSize * nBuffers << std::endl;
-	std::cout << "HERE " << (short)*buffer_ << std::endl;
-	std::cout << "new Buffer" << bufferSize * nBuffers << " pointer a " << listenerPointer << " pointer b " << writerPointer << std::endl;*/
+	nullBuffer = new int16_t[bufferSize];
+	memset(nullBuffer, 0, bufferSize * 2);
+
 };
 
 Buffer::~Buffer() {
 	for (int i = 0; i < nBuffers; i++) {
 		delete buffer_[i];
 	}
-	delete nullBuffer_;
+	delete nullBuffer;
 };
 short* Buffer::getWriterPointer() {
 	if (writerCounter == nBuffers) {
@@ -42,10 +29,9 @@ short* Buffer::getWriterPointer() {
 	return buffer_[writerCounter++];
 }
 short* Buffer::getlistenerPointer() {
-	//if (listenerCounter == writerCounter) {
-	//	//return (listenerCounter == 0) ? buffer_[nBuffers-1] : buffer_[listenerCounter-1];
-	//	return nullBuffer_;
-	//}
+	/*if (listenerCounter == writerCounter) {
+		return nullBuffer;
+	}*/
 	if (listenerCounter == nBuffers) {
 		listenerCounter = 0;
 	}
@@ -55,4 +41,7 @@ short* Buffer::getlistenerPointer() {
 
 size_t Buffer::getMaxSizeInBytes() {
 	return bufferSize * 2;
+}
+size_t Buffer::getBufferSize() {
+	return bufferSize;
 }
